@@ -1,0 +1,159 @@
+predicates
+   nondeterm person(symbol, symbol)   
+   nondeterm mama(symbol, symbol)
+   nondeterm papa(symbol, symbol)
+   nondeterm parent(symbol, symbol)
+   nondeterm married(symbol, symbol)
+   nondeterm woman(symbol)
+   nondeterm husband(symbol, symbol)
+   nondeterm wife(symbol, symbol)
+   nondeterm sister(symbol, symbol)
+   nondeterm bro(symbol, symbol)
+   nondeterm son(symbol, symbol)
+   nondeterm doch(symbol, symbol)
+   nondeterm cousin(symbol, symbol)
+   nondeterm cusen(symbol, symbol)
+   nondeterm uncle(symbol, symbol)
+   nondeterm aunt(symbol, symbol)
+   nondeterm nephew(symbol, symbol)
+   nondeterm niece(symbol, symbol)
+   nondeterm ded(symbol, symbol)
+   nondeterm baba(symbol, symbol)
+   nondeterm praded(symbol, symbol)
+   nondeterm prababa(symbol, symbol)
+   nondeterm vnuk(symbol, symbol)
+   nondeterm vnuchka(symbol, symbol)
+   nondeterm pravnuk(symbol, symbol)
+   nondeterm pravnuchka(symbol, symbol)
+   nondeterm blood(symbol, symbol)
+   nondeterm stepbrother(symbol, symbol)
+   nondeterm stepsister(symbol, symbol)
+   nondeterm shurin(symbol, symbol)
+   nondeterm dever(symbol, symbol)
+   nondeterm zolovka(symbol, symbol)
+   nondeterm testb(symbol, symbol)
+   nondeterm tescha(symbol, symbol)
+   nondeterm nevestka(symbol, symbol)
+   nondeterm svecor(symbol, symbol)
+   nondeterm svecrovb(symbol, symbol)
+   nondeterm zyatb(symbol, symbol)
+   nondeterm svoyachennica(symbol, symbol)
+   nondeterm svoyac(symbol, symbol)
+   nondeterm svat(symbol, symbol)
+   nondeterm svatya(symbol, symbol)
+   nondeterm brat2(symbol, symbol)
+   nondeterm sister2(symbol, symbol)
+   
+clauses
+   person("Bill", male).
+   person("Ann", female).
+   person("Bob", male).
+   person("Lina", female).
+   person("Luna", female).
+   person("Jon", male).
+   person("Jinny", female).
+   person("Art", male).
+   person("Masha", female).
+   person("Misha", male).
+   person("Sasha", male).
+   person("Dasha", female).
+   person("Nick", male).
+   person("May", female).
+   person("Din", male).
+   person("Dima", male).
+   person("Ivan", male).
+   person("Mark", male).
+   person("Ira", female).
+   
+   married("Mark", "Ira").
+   married("Ivan", "Luna").
+   married("Bill", "Ann").
+   married("Bob", "Jinny").
+   married("Art", "Lina").
+   married("Masha", "Misha").
+   
+   parent("Ira", "Jinny").
+   parent("Mark", "Jinny").
+      
+   parent("Bill", "Dima").
+   parent("Ann", "Dima").
+   
+   parent("Masha", "May").
+   parent("Nick", "May").
+   
+   parent("Masha", "Din").
+   parent("Nick", "Din").   
+   
+   parent("Masha", "Sasha").
+   parent("Misha", "Sasha").
+   
+   parent("Masha", "Dasha").
+   parent("Misha", "Dasha").
+   
+   parent("Art", "Masha").
+   parent("Lina", "Masha").
+   
+   parent("Bob", "Jon").
+   parent("Jinny", "Jon").
+  
+   parent("Ann", "Bob").
+   parent("Bill", "Bob").
+   
+   parent("Ann", "Lina").
+   parent("Bill", "Lina").
+   
+   parent("Ann", "Luna").
+   parent("Bill", "Luna").
+   
+  
+   
+   mama(Parent, Person) :- parent(Parent, Person), person(Parent, female).
+   papa(Parent, Person) :- parent(Parent, Person), person(Parent, male).
+   sister(Person, Sister) :- mama(Mama, Person), mama(Mama, Sister), papa(Papa, Person), papa(Papa, Sister), person(Sister, female), Sister<>Person.
+   bro(Person, Bro) :- mama(Mama, Person), mama(Mama, Bro), papa(Papa, Person), papa(Papa, Bro), person(Bro, male), Bro<>Person.
+   son(Son, Parent) :- person(Son, male), mama(Parent, Son); person(Son, male), papa(Parent, Son).
+   doch(Doch, Parent) :- person(Doch, female), mama(Parent, Doch); person(Doch, female), papa(Parent, Doch).
+   wife(Wife, Husband) :- married(Wife, Husband), person(Wife, female), person(Husband, male); married(Husband, Wife), person(Wife, female), person(Husband, male).
+   
+   cousin(Cousin, Person) :- parent(Parent, Person), bro(Parent, Bro), doch(Cousin, Bro);parent(Parent, Person), sister(Parent, Sis), doch(Cousin, Sis).
+   cusen(Cusen, Person) :- parent(Parent, Person), bro(Parent, Bro), son(Cusen, Bro);parent(Parent, Person), sister(Parent, Sis), son(Cusen, Sis).
+   uncle(Uncle, Person) :- papa(Papa, Person), bro(Papa, Uncle);mama(Mama, Person), bro(Mama, Uncle);papa(Papa, Person),sister(Papa, Sis), husband(Uncle, Sis);mama(Mama, Person),sister(Mama, Sis), husband(Uncle, Sis).
+   aunt(Aunt, Person) :- papa(Papa, Person), sister(Papa, Aunt);mama(Mama, Person), sister(Mama, Aunt);papa(Papa, Person),bro(Papa, Bro), wife(Aunt, Bro);mama(Mama, Person),bro(Mama, Bro), wife(Aunt, Bro).
+   nephew(Nephew, Person) :- uncle(Person, Nephew), person(Nephew, male);aunt(Person, Nephew),person(Nephew, male).
+   niece(Niece, Person) :- uncle(Person, Niece), person(Niece, female);aunt(Person, Niece),person(Niece, female).
+   
+   ded(Ded, Person) :- papa(Papa, Person), papa(Ded, Papa);mama(Mama, Person), papa(Ded, Mama).
+   baba(Baba, Person) :- papa(Papa, Person), mama(Baba, Papa);mama(Mama, Person), mama(Baba, Mama).
+   praded(Praded, Person) :- ded(Ded, Person),papa(Praded, Ded); baba(Baba, Person), papa(Praded, Baba).
+   prababa(Prababa, Person) :- ded(Ded, Person),mama(Prababa, Ded); baba(Baba, Person), mama(Prababa, Baba).
+   vnuk(Vnuk, Person) :- ded(Person, Vnuk), person(Vnuk, male); baba(Person, Vnuk), person(Vnuk, male).
+   vnuchka(Vnuchka, Person) :- ded(Person, Vnuchka), person(Vnuchka, female); baba(Person, Vnuchka), person(Vnuchka, female).
+   pravnuk(Pravnuk, Person) :- praded(Person, Pravnuk),person(Pravnuk, male); prababa(Person, Pravnuk), person(Pravnuk, male).
+   pravnuchka(Pravnuchka, Person) :- praded(Person, Pravnuchka), person(Pravnuchka, female); prababa(Person, Pravnuchka), person(Pravnuchka, female).
+   
+   blood(Blood, Person) :- son(Blood, Person); doch(Blood, Person); vnuk(Blood, Person); vnuchka(Blood, Person); pravnuk(Blood, Person);pravnuchka(Blood, Person);mama(Blood, Person); papa(Blood, Person); 
+   bro(Person, Blood); sister(Person, Blood); nephew(Blood, Person); niece(Blood, Person);nephew(Nephew, Person), parent(Nephew, Blood);niece(Niece, Person),parent(Niece, Blood);
+   uncle(Blood, Person), ded(Ded, Person), papa(Papa, Blood), Papa=Ded; aunt(Blood, Person), ded(Ded, Person), papa(Papa, Blood), Papa=Ded;brat2(Blood, Person); sister2(Blood, Person);
+   praded(Blood, Person); praded(Praded, Person), parent(Praded, Blood).
+    
+   
+   stepbrother(Stbro, Person) :- mama(Mamast, Stbro), mama(Mamaper, Person), Mamast=Mamaper, papa(Papast, Stbro), papa(Papaper, Person), Papast<>Papaper, person(Stbro, male);mama(Mamast, Stbro), mama(Mamaper, Person), Mamast<>Mamaper, papa(Papast, Stbro), papa(Papaper, Person), Papast=Papaper, person(Stbro, male).
+   stepsister(Stsis, Person) :- mama(Mamast, Stsis), mama(Mamaper, Person), Mamast=Mamaper, papa(Papast, Stsis), papa(Papaper, Person), Papast<>Papaper, person(Stsis, female);mama(Mamast, Stsis), mama(Mamaper, Person), Mamast<>Mamaper, papa(Papast, Stsis), papa(Papaper, Person), Papast=Papaper, person(Stsis, female).
+   shurin(Shurin, Person) :- wife(Wife, Person), bro(Wife, Shurin).
+   dever(Dever, Person) :- husband(Husband, Person), bro(Husband, Dever).
+   zolovka(Zolovka, Person) :- husband(Husband, Person), sister(Husband, Zolovka).
+   testb(Testb, Person) :- wife(Wife, Person), papa(Testb, Wife).
+   tescha(Tescha, Person) :- testb(Testb, Person), wife(Tescha, Testb).
+   nevestka(Nevestka, Person) :- son(Son, Person), wife(Nevestka, Son); bro(Person, Bro), wife(Nevestka, Bro); vnuk(Vnuk, Person), wife(Nevestka, Vnuk); shurin(Shurin, Person), wife(Nevestka, Shurin).
+   svecor(Svecor, Person) :- husband(Husband, Person), papa(Svecor, Husband).
+   svecrovb(Svecrovb, Person) :- husband(Husband, Person), mama(Svecrovb, Husband).
+   zyatb(Zyatb, Person) :- doch(Doch, Person), husband(Zyatb, Doch); sister(Person, Sis), husband(Zyatb, Sis).
+   svoyachennica(Svoyachennica, Person) :- wife(Wife, Person), sister(Wife, Svoyachennica).
+   svoyac(Svoyac, Person) :- svoyachennica(Svoyachennica, Person), husband(Svoyac,Svoyachennica).
+   svat(Svat, Person) :- person(Person, male), son(Son, Person), wife(Wife, Son), papa(Svat, Wife); person(Person, male), doch(Doch, Person), husband(Husband, Doch), papa(Svat, Husband).
+   svatya(Svatya, Person) :- person(Person, female), son(Son, Person), wife(Wife, Son), mama(Svatya, Wife); person(Person, female), doch(Doch, Person), husband(Husband, Doch), mama(Svatya, Husband).
+   brat2(Brat, Person) :- uncle(Uncle, Person), son(Brat, Uncle).
+   sister2(Sis, Person) :- uncle(Uncle, Person), doch(Sis, Uncle).
+   
+   woman(Person) :- person(Person, female).
+   husband(Husband, Wife) :- married(Wife, Husband), person(Wife, female), person(Husband, male); married(Husband, Wife), person(Wife, female), person(Husband, male).
