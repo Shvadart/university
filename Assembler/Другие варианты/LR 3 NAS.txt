@@ -1,0 +1,111 @@
+.386
+.MODEL FLAT
+.DATA
+LINE DB 200 dup(?)
+ORDER DB 200 dup(?)
+LENLINE DD ?
+LENORD DD ?
+II DD 0
+
+
+.CODE
+_find_position PROC
+PUSH EBP
+MOV EBP, ESP
+
+ADD EBP, 8
+MOV EAX, [EBP] + 4
+MOV LENLINE, EAX; в lenline длина введённой строки
+
+MOV EAX, [EBP] + 12
+MOV LENORD, EAX; в lenord длина введённой последовательности
+
+;заполнение буфера для работы с введённой строкой
+XOR EDI, EDI
+MOV ESI, OFFSET LINE
+MOV ECX, LENLINE
+LIN:
+	MOV EAX, [EBP]		; считываем символ
+	MOV AL, [EAX + EDI] ; получаем адрес текущего символа
+	MOV AH, 0
+	PUSH AX
+	XOR EAX, EAX
+	POP AX
+	MOV [ESI], EAX
+	INC ESI
+INC EDI
+MOV EDX, [EBP]
+LOOP LIN
+
+;заполнение буфера для работы с введённой последовательностью
+MOV ECX, LENORD
+MOV ESI, OFFSET ORDER
+XOR EDI, EDI
+ORD:
+	MOV EAX, [EBP] + 8		; считываем символ
+	MOV AL, [EAX + EDI] ; получаем адрес текущего символа
+	MOV AH, 0
+;заполнение буфера
+	PUSH AX
+	XOR EAX, EAX
+	POP AX
+	MOV [ESI], EAX
+	INC ESI
+INC EDI
+MOV EDX, [EBP] + 8
+LOOP ORD
+
+
+CLD; устанавливаем направление
+LEA ESI, LINE; в регистры заносим адреса первых обрабатываемых элементов
+LEA EDI, ORDER
+
+XOR ECX, ECX; в есх будет лежать сдвиг введённой строки
+START:
+
+CMP ECX, LENLINE; если дошли до конца строки, то последовательность не найдена
+JE ERROR
+
+CMPSB; сравниваем два элемента
+JE YES; ;если элементы одинаковы
+MOV II, 0; в переменной II лежит количество элементов последовательности, которые при сравнении совпали с элементами введённой строки
+LEA EDI, ORDER
+LEA ESI, LINE
+PUSH ECX
+;после каждого неудачного сравнивания сдвигаем начало введённой строки на 1 вправо
+WHIL:
+	CMP ECX, 0
+	JE END_WHIL
+	INC ESI
+	DEC ECX
+	JMP WHIL
+END_WHIL:
+
+POP ECX
+INC ECX
+
+JMP START
+YES:
+	INC II
+	MOV EAX, II
+	MOV EBX, LENORD
+	CMP EAX, EBX; если количество одинаковых элементов совпало с длиной последовательности, то выход
+	JE EXIT
+	JMP START
+
+EXIT:
+	CMP ECX, 0
+	JE PL
+	JMP N
+	PL:
+		INC ECX
+	N:
+	POP EBP
+	MOV EAX, ECX
+	RET
+ERROR:
+POP EBP
+MOV EAX, 0
+RET
+_find_position ENDP
+END

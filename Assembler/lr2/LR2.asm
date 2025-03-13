@@ -1,0 +1,162 @@
+.386
+.MODEL FLAT, STDCALL
+OPTION CASEMAP: NONE
+EXTERN  WriteConsoleA@20: PROC
+EXTERN CharToOemA@8: PROC
+EXTERN GetStdHandle@4: PROC
+EXTERN lstrlenA@4: PROC
+EXTERN ExitProcess@4: PROC
+EXTERN ReadConsoleA@20: PROC
+
+
+;--------------------------------
+.DATA
+STR1 DB "Введите строку: ",13,10,0
+STR2 DB "Максимум: ",13,10,0
+STR3 DB 13,10, "Минимум: ",0
+ERROR DB "Ошибка. Некорректный символ!",0
+DIN DD ?
+DOUT DD ?
+LENS DD ?
+MAX DD 0
+MIN DD 1000
+BUF DB 200 dup (?)
+BUFOUT DB 200 DUP (?)
+;----------------------------------
+.CODE
+MAIN PROC
+
+;перекодировка строк
+MOV EAX, OFFSET STR1
+PUSH EAX
+PUSH EAX
+CALL CharToOemA@8
+MOV EAX, OFFSET STR2
+PUSH EAX
+PUSH EAX
+CALL CharToOemA@8
+MOV EAX, OFFSET STR3
+PUSH EAX
+PUSH EAX
+CALL CharToOemA@8
+MOV EAX, OFFSET ERROR
+PUSH EAX
+PUSH EAX
+CALL CharToOemA@8
+
+;определение дескрипторов ввода и вывода
+PUSH -11
+CALL GetStdHandle@4
+MOV DOUT, EAX
+PUSH -10
+CALL GetStdHandle@4
+MOV DIN, EAX
+
+;вывод сообщения 1
+PUSH OFFSET STR1
+CALL lstrlenA@4
+PUSH 0
+PUSH OFFSET LENS
+PUSH EAX
+PUSH OFFSET STR1
+PUSH DOUT
+CALL WriteConsoleA@20
+
+;ввод строки
+PUSH 0
+PUSH OFFSET LENS
+PUSH 200
+PUSH OFFSET BUF
+PUSH DIN
+CALL ReadConsoleA@20
+
+;--------------------------------
+;поиск наибольшего и наименьшего элементов
+DEC LENS
+DEC LENS
+CLD
+MOV ECX, LENS
+LEA ESI, OFFSET BUF
+FIND:
+	LODS BUF
+	CMP EAX, 48
+	JB ERROR_F
+	CMP EAX, 57
+	JA ERROR_F
+	CMP EAX, MIN
+	JAE M
+	MINIM:
+		MOV MIN, EAX
+	M:
+		CMP EAX, MAX
+		JBE EXIT
+	MAXIM:
+		MOV MAX, EAX
+	EXIT:
+LOOP FIND
+;----------------------------------------
+;вывод сообщения 2
+PUSH OFFSET STR2
+CALL lstrlenA@4
+PUSH 0
+PUSH OFFSET LENS
+PUSH EAX
+PUSH OFFSET STR2
+PUSH DOUT
+CALL WriteConsoleA@20
+
+MOV ESI, OFFSET BUFOUT
+MOV EAX, MAX
+MOV [ESI], EAX
+
+;вывод макс
+PUSH OFFSET BUFOUT
+CALL lstrlenA@4
+PUSH 0
+PUSH OFFSET LENS
+PUSH EAX
+PUSH OFFSET BUFOUT
+PUSH DOUT
+CALL WriteConsoleA@20
+
+;вывод сообщения 3
+PUSH OFFSET STR3 
+CALL lstrlenA@4
+PUSH 0
+PUSH OFFSET LENS
+PUSH EAX
+PUSH OFFSET STR3
+PUSH DOUT
+CALL WriteConsoleA@20
+
+MOV EAX, MIN
+MOV [ESI], EAX
+
+;вывод мин
+PUSH OFFSET BUFOUT
+CALL lstrlenA@4
+PUSH 0
+PUSH OFFSET LENS
+PUSH EAX
+PUSH OFFSET BUFOUT
+PUSH DOUT
+CALL WriteConsoleA@20
+
+PUSH 0
+	CALL ExitProcess@4
+
+ERROR_F:
+	PUSH OFFSET ERROR
+	CALL lstrlenA@4
+	PUSH 0
+	PUSH OFFSET LENS
+	PUSH EAX
+	PUSH OFFSET ERROR
+	PUSH DOUT
+	CALL WriteConsoleA@20
+	PUSH 0
+	CALL ExitProcess@4
+
+MAIN ENDP
+END MAIN
+

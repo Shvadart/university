@@ -1,0 +1,80 @@
+.386
+.MODEL FLAT
+.DATA
+MAX DW 0
+MIN DW 1000
+LENS DD ?
+BUF DB 200 dup (?)
+
+
+.CODE
+_find PROC
+PUSH EBP
+MOV EBP, ESP
+
+ADD EBP, 8			 
+MOV ECX, [EBP]+4
+XOR EDI, EDI
+
+PUSH ECX
+MOV ESI, OFFSET BUF
+
+BUFER:
+MOV EAX, [EBP]		; считываем символ
+MOV AL, [EAX + EDI] ; получаем адрес текущего символа
+MOV AH, 0
+;заполнение буфера
+CMP AX, 48 ;проверка входных данных
+	JB ERROR
+	CMP AX, 57
+	JA ERROR
+	PUSH AX
+	XOR EAX, EAX
+	POP AX
+	MOV [ESI], EAX
+	INC ESI
+INC EDI
+MOV EDX, [EBP] + 8
+LOOP BUFER
+
+;поиск максимума и минимума
+CLD
+POP ECX
+LEA ESI, OFFSET BUF
+
+PROG:
+LODS BUF
+CMP AX, MIN
+	JAE M
+	MINIM:
+		MOV MIN, AX
+	M:
+		CMP AX, MAX
+		JBE EXIT
+	MAXIM:
+		MOV MAX, AX
+	EXIT:
+LOOP PROG
+
+XOR EBX, EBX
+MOV BX, MAX
+MOV EAX, [EBP] + 8
+MOV [EAX], EBX
+
+XOR EBX, EBX
+MOV BX, MIN
+MOV EAX, [EBP] + 12
+MOV [EAX], EBX
+
+POP EBP
+RET
+
+;обработка при ошибке
+ERROR:
+POP ECX
+POP EBP
+MOV EAX, 1
+RET
+
+_find ENDP
+END

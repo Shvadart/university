@@ -1,0 +1,266 @@
+.386
+.MODEL FLAT, STDCALL
+OPTION CASEMAP: NONE
+EXTERN  WriteConsoleA@20: PROC
+EXTERN CharToOemA@8: PROC
+EXTERN GetStdHandle@4: PROC
+EXTERN lstrlenA@4: PROC
+EXTERN ExitProcess@4: PROC
+EXTERN ReadConsoleA@20: PROC
+;--------------------------------
+.DATA
+STR1 DB "Введите первое число: ",13,10,0
+STR2 DB "Введите второе число: ",13,10,0
+STR3 DB "Результат умножения: ",0
+ERROR DB "Ошибка. Число должно быть от 3 до 8 символов",0
+OVERFLOW DB "Ошибка, регистр переполнен",0
+DIN DD ?
+DOUT DD ?
+LENS DD ?
+NUM1 DD ?
+NUM2 DD ?
+NUM DD ?
+SCH DD ?
+BUF DB 200 dup (?)
+OS DD ?
+S_16 DD 16
+SIGN_1 DD ?
+SIGN_2 DD ?
+SIGN DD ?
+;----------------------------------
+.CODE
+MAIN PROC
+;перекодировка строк
+MOV EAX, OFFSET STR1
+PUSH EAX
+PUSH EAX
+CALL CharToOemA@8
+MOV EAX, OFFSET STR2
+PUSH EAX
+PUSH EAX
+CALL CharToOemA@8
+MOV EAX, OFFSET STR3
+PUSH EAX
+PUSH EAX
+CALL CharToOemA@8
+MOV EAX, OFFSET ERROR
+PUSH EAX
+PUSH EAX
+CALL CharToOemA@8
+MOV EAX, OFFSET OVERFLOW
+PUSH EAX
+PUSH EAX
+CALL CharToOemA@8
+
+;определение дескрипторов ввода и вывода
+PUSH -11
+CALL GetStdHandle@4
+MOV DOUT, EAX
+PUSH -10
+CALL GetStdHandle@4
+MOV DIN, EAX
+
+;вывод сообщения 1
+PUSH OFFSET STR1
+CALL lstrlenA@4
+PUSH 0
+PUSH OFFSET LENS
+PUSH EAX
+PUSH OFFSET STR1
+PUSH DOUT
+CALL WriteConsoleA@20
+;--------------------------------
+;ввод числа 1
+PUSH 0
+PUSH OFFSET LENS
+PUSH 200
+PUSH OFFSET BUF
+PUSH DIN
+CALL ReadConsoleA@20
+
+;преобразование строки в число
+MOV ESI, OFFSET BUF
+DEC LENS
+DEC LENS
+MOV ECX, LENS
+
+MOV AL, [ESI] ;сохранение информации о знаке
+CMP AL, '-'
+JNE CONTINUE_F
+DEC LENS
+MOV ECX, LENS
+INC ESI
+MOV SIGN_1, 1
+
+CONTINUE_F:
+	CMP LENS, 3
+	JB ERROR_F
+	CMP LENS, 8
+	JA ERROR_F
+	MOV OS, 16
+	XOR EAX, EAX
+	XOR EBX, EBX
+	CONV_F: 
+		MOV BL, [ESI] ;перевод числа в 10 систему счисления
+		SUB BL, 48
+		CMP BL, 9
+		JLE M1
+		SUB BL, 7
+		M1:	
+			MUL OS
+			ADD EAX, EBX
+			INC ESI
+	LOOP CONV_F
+	MOV NUM1, EAX
+;----------------------------------
+;вывод сообщения 2
+PUSH OFFSET STR2
+CALL lstrlenA@4
+PUSH 0
+PUSH OFFSET LENS
+PUSH EAX
+PUSH OFFSET STR2
+PUSH DOUT
+CALL WriteConsoleA@20
+
+;ввод числа 2
+PUSH 0
+PUSH OFFSET LENS
+PUSH 200
+PUSH OFFSET BUF
+PUSH DIN
+CALL ReadConsoleA@20
+
+;преобразование строки в число
+MOV ESI, OFFSET BUF
+DEC LENS
+DEC LENS
+MOV ECX, LENS
+
+MOV AL, [ESI] ;сохранение информации о знаке
+CMP AL, '-'
+JNE CONTINUE_S
+DEC LENS
+MOV ECX, LENS
+INC ESI
+MOV SIGN_2, 1
+
+CONTINUE_S:
+	CMP LENS, 3
+	JB ERROR_F
+	CMP LENS, 8
+	JA ERROR_F
+	MOV OS, 16
+	XOR EAX, EAX
+	XOR EBX, EBX
+	CONV_S:
+		MOV BL, [ESI] ;перевод числа в 10 систему счисления
+		SUB BL, 48
+		CMP BL, 9
+		JLE M2
+		SUB BL, 7
+		M2:	
+			MUL OS
+			ADD EAX, EBX
+			INC ESI
+	LOOP CONV_S
+	MOV NUM2, EAX
+;----------------------------------------
+
+;умножение чиселок
+MOV EAX, NUM1
+MOV EBX, NUM2
+MUL EBX
+MOV NUM, EAX
+JC OVER
+
+MOV ESI, OFFSET BUF
+
+;вычисление знака получившегося числа
+MOV EAX, SIGN_1
+MOV EBX, SIGN_2
+CMP EAX, EBX
+JE M3
+MOV SIGN, 1
+MOV AX, 45
+MOV [ESI], AX
+INC ESI
+JNE M4
+M3:
+	MOV SIGN, 0
+M4:
+
+;преобразование в строку
+MOV EBX, 10
+MOV EAX, NUM
+MOV SCH, 0
+M5:
+	DIV EBX
+	ADD EDX, 48
+	PUSH EDX
+	XOR EDX, EDX
+	INC SCH
+CMP EAX, 0
+JE M6
+MOV ECX, 2
+LOOP M5
+M6:
+	MOV ECX, SCH
+M7:
+	POP [ESI]
+	INC ESI
+LOOP M7
+
+;вывод сообщения 3
+PUSH OFFSET STR3 
+CALL lstrlenA@4
+PUSH 0
+PUSH OFFSET LENS
+PUSH EAX
+PUSH OFFSET STR3
+PUSH DOUT
+CALL WriteConsoleA@20
+
+;вывод получившегося результата
+PUSH OFFSET BUF
+CALL lstrlenA@4
+PUSH 0
+PUSH OFFSET LENS
+PUSH EAX
+PUSH OFFSET BUF
+PUSH DOUT
+CALL WriteConsoleA@20
+PUSH 0
+CALL ExitProcess@4
+
+PUSH 0
+CALL ExitProcess@4
+
+ERROR_F:
+	PUSH OFFSET ERROR
+	CALL lstrlenA@4
+	PUSH 0
+	PUSH OFFSET LENS
+	PUSH EAX
+	PUSH OFFSET ERROR
+	PUSH DOUT
+	CALL WriteConsoleA@20
+	PUSH 0
+	CALL ExitProcess@4
+
+OVER:
+	PUSH OFFSET OVERFLOW
+	CALL lstrlenA@4
+	PUSH 0
+	PUSH OFFSET LENS
+	PUSH EAX
+	PUSH OFFSET OVERFLOW
+	PUSH DOUT
+	CALL WriteConsoleA@20
+	PUSH 0
+	CALL ExitProcess@4
+
+MAIN ENDP
+END MAIN
+
+

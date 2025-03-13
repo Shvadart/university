@@ -1,0 +1,48 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include <conio.h>
+#include <locale>
+#include <iostream>
+
+extern "C" int solution(float x,float* y );
+
+//проверка входных данных
+bool is_float(const char* s, float* dest) {
+	if (s == NULL) {
+		return false;
+	}
+	char *endptr;
+	*dest = (float)strtod(s, &endptr);
+	if (s == endptr) {
+		return false;
+	}
+	while (isspace((unsigned char)*endptr))
+		endptr++;
+	return *endptr == '\0';
+}
+
+void main()
+{
+	char buf[100];
+	int out;
+	float x, y;
+	printf("(x+2x^2)/(x-1)\nEnter the x: ");
+	gets_s(buf);
+	if (is_float(buf, &x)) {
+		out = solution(x, &y);
+	}
+	else
+		out = 1;
+	if (out == 1)
+	{
+		printf("Invalid character!");
+	}
+	else {
+		if (out == 2) {
+			printf("Divizion by zero!");
+		}
+		else {
+			printf("Result: ");
+			printf(" %f", y);
+		}
+	}
+}
