@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Швадченко Артём Валерьевич</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="stylet.css">
+    <script src="script.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1 class="underline-text">Страница обо мне</h1>
+        <!--<img src="test/я.png" alt="Мое фото" width="200">-->
+        <div class="image-parlax right" ontouchstart="this.classList.toggle('hover');">
+            <div class="image-container">
+              <div class="front-side center2" style="background-image: url(test/я.png)">
+              </div>
+              <div class="back-side">
+                <div class="inner">
+                  <p class="center">Швадченко</p>
+                  <p class="center">Артём</p>
+                  <p class="center">Валерьевич</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        <p>
+            Здравствуйте! Меня зовут Швадченко Артём Валерьевич. Родился и вырос в Новосибирске. 
+            Окончил Гимназию №9 c золотой медалью. 
+            Я уже третий курс обучаюсь на факультете прикладной математики и информатики Новосибирского государственного технического университета.
+             За эти 2.5 года учёбы я приобрёл очень большой багаж знаний, в большей степени благодаря хорошей работе преподавателей и их умению донести материал. 
+             Также за это время у меня появилось еще больше знакомых. 
+        </p>
+        <p>В свободное время я играю в настольный теннис, люблю кататься на коньках и играть в мобильные шутеры, к примеру в 
+            <a class="underline-text pubg" href="https://www.pubgmobile.com/ru/home.shtml">
+                PUBG mobile</a> я какое-то время входил в топ-5 по Новосибирской области по количеству победных убийств. 
+             Но на самом деле игры убивают много времени, и я стараюсь его контролировать.
+        </p>
+    </div>
+   
+    <div class="comments">
+        <h2 class="comments-title">Комментарии</h2>
+        <div id="comments"></div>
+        <form id="commentForm">
+          <label for="authorInput">Имя:</label>
+          <br />
+          <input type="text" id="authorInput" required />
+          <br />
+          <label for="commentInput">Текст:</label>
+          <br />
+          <textarea
+            id="commentInput"
+            placeholder="Введите текст"
+            required
+          ></textarea>
+          <br />
+          <button type="button" onclick="addComment()">Отправить</button>
+          <br />
+          <button type="button" onclick="saveCommentsToFile()">
+            Сохранить комментарии
+          </button>
+        </form>
+      </div>
+
+<section>
+    <div class="center">
+        
+        <a href="https://wa.me/+79537658103">
+            <img class="icon_wrap rotate-img" src="test/whatsap.png" alt="WhatsApp" width="40">
+            WhatsApp: +79537658103
+        </a>
+    </div>
+    <div class="center">
+        <a href="https://t.me/Shved555">
+          
+                <img class="icon_wrap rotate-img" src="test/tg.png" alt="Telegram" width="40"> 
+                Telegram: @Shved555
+                
+        </a>
+    </div>
+</section>
+</body>
+</html>
