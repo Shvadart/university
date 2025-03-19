@@ -1,3 +1,4 @@
+:- working_directory(_, 'C:/users/artem/documents/prolog').
 
 :- dynamic is_ans/2.
 :- dynamic кандидат/1.
